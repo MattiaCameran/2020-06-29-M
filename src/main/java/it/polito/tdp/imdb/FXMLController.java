@@ -5,8 +5,11 @@
 package it.polito.tdp.imdb;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.imdb.model.Director;
+import it.polito.tdp.imdb.model.DirectorPesato;
 import it.polito.tdp.imdb.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,10 +38,10 @@ public class FXMLController {
     private Button btnCercaAffini; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxAnno"
-    private ComboBox<?> boxAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxRegista"
-    private ComboBox<?> boxRegista; // Value injected by FXMLLoader
+    private ComboBox<Director> boxRegista; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtAttoriCondivisi"
     private TextField txtAttoriCondivisi; // Value injected by FXMLLoader
@@ -49,11 +52,36 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	txtResult.clear();
+    	Integer anno = this.boxAnno.getValue();
+    	
+    	if(anno == null) {
+    		txtResult.appendText("Errore: selezionare un' annata!");
+    		return;
+    	}
+    	String msg = this.model.creaGrafo(anno);
+    	txtResult.appendText(msg);
+    	
+    	this.boxRegista.getItems().addAll(this.model.getDirettori());
     }
 
     @FXML
     void doRegistiAdiacenti(ActionEvent event) {
 
+    	txtResult.clear();
+    	Director d = this.boxRegista.getValue();
+    	
+    	if(d == null) {
+    		txtResult.appendText("Errore: selezionare un direttore!");
+    		return;
+    	}
+    	
+    	List<DirectorPesato> direttori = this.model.getListaDirectorPesato(d);
+    	
+    	txtResult.appendText("REGISTI ADIACENTI A: "+d.toString()+"\n");
+    	for(DirectorPesato dp: direttori) {
+    		txtResult.appendText(dp.toString()+ "\n");
+    	}
     }
 
     @FXML
@@ -77,6 +105,7 @@ public class FXMLController {
     	
     	this.model = model;
     	
+    	this.boxAnno.getItems().addAll(this.model.getAnni());
     }
     
 }
